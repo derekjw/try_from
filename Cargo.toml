@@ -2,3 +2,7 @@
 name = "try_from"
 version = "0.1.0"
 authors = ["Derek Williams <derek@fyrie.net>"]
+description = "TryFrom and TryInto traits for failable conversions that return a Result."
+repository = "https://github.com/derekjw/try_from"
+readme = "README.md"
+license = "MIT"
