@@ -36,6 +36,12 @@ mod tests {
     }
 
     #[test]
+    fn should_have_try_from_impl_for_from_str_that_handles_err() {
+        let result = u32::try_from("hello");
+        assert_eq!(format!("{}", result.unwrap_err()), "invalid digit found in string")
+    }
+
+    #[test]
     fn should_have_try_into_impl_for_from_str() {
         let result: Result<u32, num::ParseIntError> = "3".try_into();
         assert_eq!(result.unwrap(), 3)
