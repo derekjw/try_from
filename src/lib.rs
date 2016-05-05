@@ -27,7 +27,6 @@ impl<'a, T> TryFrom<&'a str> for T where T: FromStr {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::num;
 
     #[test]
     fn should_have_try_from_impl_for_from_str() {
@@ -43,7 +42,7 @@ mod tests {
 
     #[test]
     fn should_have_try_into_impl_for_from_str() {
-        let result: Result<u32, num::ParseIntError> = "3".try_into();
+        let result: Result<u32, _> = "3".try_into();
         assert_eq!(result.unwrap(), 3)
     }
 }
