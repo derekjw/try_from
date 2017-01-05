@@ -1,5 +1,9 @@
 use std::str::FromStr;
 
+mod int;
+
+pub use int::TryFromIntError;
+
 pub trait TryFrom<T>: Sized {
     type Err;
     fn try_from(T) -> Result<Self, Self::Err>;
@@ -46,3 +50,8 @@ mod tests {
         assert_eq!(result.unwrap(), 3)
     }
 }
+
+/// Error type used when conversion is infallible.
+/// The never type (`!`) will replace this when it is available in stable Rust.
+#[derive(Debug, Eq, PartialEq)]
+pub enum Void {}
