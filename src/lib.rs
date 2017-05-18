@@ -1,7 +1,9 @@
 use std::str::FromStr;
 
+mod char;
 mod int;
 
+pub use char::TryFromIntToCharError;
 pub use int::TryFromIntError;
 
 pub trait TryFrom<T>: Sized {
