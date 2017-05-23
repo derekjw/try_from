@@ -1,6 +1,6 @@
 [package]
 name = "try_from"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["Derek Williams <derek@fyrie.net>"]
 description = "TryFrom and TryInto traits for failable conversions that return a Result."
 repository = "https://github.com/derekjw/try_from"
