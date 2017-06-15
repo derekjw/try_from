@@ -5,7 +5,7 @@ use std::error::Error;
 use std::fmt::{self, Display, Formatter};
 use std::mem;
 
-use ::{TryFrom, Void};
+use {TryFrom, Void};
 
 /// Error which occurs when conversion from one integer type to another fails.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -15,7 +15,7 @@ pub enum TryFromIntError {
 }
 
 impl TryFromIntError {
-    fn as_str (self) -> &'static str {
+    fn as_str(self) -> &'static str {
         match self {
             TryFromIntError::Overflow => "integer overflow",
             TryFromIntError::Underflow => "integer underflow",
@@ -24,13 +24,15 @@ impl TryFromIntError {
 }
 
 impl Display for TryFromIntError {
-    fn fmt (&self, n: &mut Formatter) -> fmt::Result {
+    fn fmt(&self, n: &mut Formatter) -> fmt::Result {
         n.write_str(self.as_str())
     }
 }
 
 impl Error for TryFromIntError {
-    fn description (&self) -> &str { self.as_str() }
+    fn description(&self) -> &str {
+        self.as_str()
+    }
 }
 
 macro_rules! impl_infallible {
@@ -56,7 +58,7 @@ impl_infallible! {
 }
 
 #[test]
-fn test_infallible () {
+fn test_infallible() {
     assert_eq!(u64::try_from(usize::MAX), Ok(usize::MAX as u64));
 }
 
@@ -84,7 +86,7 @@ impl_unsigned_from_unsigned! {
 }
 
 #[test]
-fn test_unsigned_from_unsigned () {
+fn test_unsigned_from_unsigned() {
     assert_eq!(u8::try_from(0xffu16), Ok(0xffu8));
     assert_eq!(u8::try_from(0x100u16), Err(TryFromIntError::Overflow));
 
@@ -124,7 +126,7 @@ impl_unsigned_from_signed! {
 }
 
 #[test]
-fn test_unsigned_from_signed () {
+fn test_unsigned_from_signed() {
     assert_eq!(u8::try_from(0i16), Ok(0u8));
     assert_eq!(u8::try_from(-1i16), Err(TryFromIntError::Underflow));
     assert_eq!(u8::try_from(256i16), Err(TryFromIntError::Overflow));
@@ -163,13 +165,16 @@ impl_signed_from_unsigned! {
 }
 
 #[test]
-fn test_signed_from_unsigned () {
+fn test_signed_from_unsigned() {
     assert_eq!(i8::try_from(0x7fu8), Ok(0x7fi8));
     assert_eq!(i8::try_from(0x80u8), Err(TryFromIntError::Overflow));
 
     if cfg!(target_pointer_width = "32") {
         assert_eq!(i64::try_from(usize::MAX), Ok(0xffff_ffffi64));
-        assert_eq!(isize::try_from(0x8000_0000u64), Err(TryFromIntError::Overflow));
+        assert_eq!(
+            isize::try_from(0x8000_0000u64),
+            Err(TryFromIntError::Overflow)
+        );
     } else if cfg!(target_pointer_width = "64") {
         assert_eq!(i64::try_from(usize::MAX), Err(TryFromIntError::Overflow));
         assert!(isize::try_from(0x8000_0000u64).unwrap() > 0x7fff_ffff);
@@ -203,7 +208,7 @@ impl_signed_from_signed! {
 }
 
 #[test]
-fn test_signed_from_signed () {
+fn test_signed_from_signed() {
     assert_eq!(i8::try_from(127i16), Ok(127i8));
     assert_eq!(i8::try_from(128i16), Err(TryFromIntError::Overflow));
     assert_eq!(i8::try_from(-128i16), Ok(-128i8));
