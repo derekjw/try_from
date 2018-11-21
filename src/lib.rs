@@ -1,5 +1,16 @@
-use std::str::FromStr;
+#![cfg(feature = "no_std")]
+#![no_std]
 
+#[macro_use]
+extern crate cfg_if;
+
+cfg_if! (
+    if #[cfg(feature="no_std")] {
+        use core::str::FromStr;
+    } else {
+        use std::str::FromStr;
+    }
+);
 mod char;
 mod int;
 

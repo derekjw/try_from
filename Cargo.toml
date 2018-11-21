@@ -6,3 +6,9 @@ description = "TryFrom and TryInto traits for failable conversions that return a
 repository = "https://github.com/derekjw/try_from"
 readme = "README.md"
 license = "MIT"
+
+[dependencies]
+cfg-if = "0.1"
+
+[features]
+no_std = []
