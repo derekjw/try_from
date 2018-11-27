@@ -1,8 +1,15 @@
 // Conversion between machine integers and `char`.
 
-use std::char;
-use std::error::Error;
-use std::fmt::{self, Display, Formatter};
+cfg_if! (
+    if #[cfg(feature="no_std")] {
+        use core::char;
+        use core::fmt::{self, Display, Formatter};
+    } else {
+        use std::char;
+        use std::error::Error;
+        use std::fmt::{self, Display, Formatter};
+    }
+);
 
 use {TryFrom, TryFromIntError, Void};
 
@@ -96,11 +103,16 @@ impl Display for TryFromIntToCharError {
     }
 }
 
-impl Error for TryFromIntToCharError {
-    fn description(&self) -> &str {
-        self.as_str()
+
+cfg_if! (
+    if #[cfg(not(feature="no_std"))] {
+        impl Error for TryFromIntToCharError {
+            fn description(&self) -> &str {
+                self.as_str()
+            }
+        }
     }
-}
+);
 
 impl From<TryFromIntError> for TryFromIntToCharError {
     fn from(other: TryFromIntError) -> TryFromIntToCharError {

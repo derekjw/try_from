@@ -1,9 +1,17 @@
 // Conversion between machine integers.
 
-use std::{u8, u16, u32, u64, usize, i8, i16, i32, i64, isize};
-use std::error::Error;
-use std::fmt::{self, Display, Formatter};
-use std::mem;
+cfg_if! (
+    if #[cfg(feature="no_std")] {
+        use core::{u8, u16, u32, u64, usize, i8, i16, i32, i64, isize};
+        use core::fmt::{self, Display, Formatter};
+        use core::mem;
+    } else {
+        use std::{u8, u16, u32, u64, usize, i8, i16, i32, i64, isize};
+        use std::error::Error;
+        use std::fmt::{self, Display, Formatter};
+        use std::mem;
+    }
+);
 
 use {TryFrom, Void};
 
@@ -29,11 +37,16 @@ impl Display for TryFromIntError {
     }
 }
 
-impl Error for TryFromIntError {
-    fn description(&self) -> &str {
-        self.as_str()
+
+cfg_if! (
+    if #[cfg(not(feature="no_std"))] {
+        impl Error for TryFromIntError {
+            fn description(&self) -> &str {
+                self.as_str()
+            }
+        }
     }
-}
+);
 
 macro_rules! impl_infallible {
     { $($t:ident from $($f:ident),*;)* } => { $($(
