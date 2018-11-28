@@ -2,11 +2,11 @@
 
 cfg_if! (
     if #[cfg(feature="no_std")] {
-        use core::{u8, u16, u32, u64, usize, i8, i16, i32, i64, isize};
+        use core::{u8, u16, u32, u64, u128, usize, i8, i16, i32, i64, i128, isize};
         use core::fmt::{self, Display, Formatter};
         use core::mem;
     } else {
-        use std::{u8, u16, u32, u64, usize, i8, i16, i32, i64, isize};
+        use std::{u8, u16, u32, u64, u128, usize, i8, i16, i32, i64, i128, isize};
         use std::error::Error;
         use std::fmt::{self, Display, Formatter};
         use std::mem;
@@ -62,11 +62,13 @@ impl_infallible! {
     u16 from u8, u16;
     u32 from u8, u16, u32;
     u64 from u8, u16, u32, u64, usize;
+    u128 from u8, u16, u32, u64, u128;
     usize from u8, u16, u32, usize;
     i8 from i8;
     i16 from u8, i8, i16;
     i32 from u8, u16, i8, i16, i32;
     i64 from u8, u16, u32, i8, i16, i32, i64, isize;
+    i128 from i8, i16, i32, i64, i128;
     isize from u8, u16, i8, i16, i32, isize;
 }
 
@@ -92,10 +94,11 @@ macro_rules! impl_unsigned_from_unsigned {
 }
 
 impl_unsigned_from_unsigned! {
-    u8 from u16, u32, u64, usize;
-    u16 from u32, u64, usize;
-    u32 from u64, usize;
-    usize from u64;
+    u8 from u16, u32, u64, u128, usize;
+    u16 from u32, u64, u128, usize;
+    u32 from u64, u128, usize;
+    u64 from u128;
+    usize from u64, u128;
 }
 
 #[test]
@@ -131,11 +134,12 @@ macro_rules! impl_unsigned_from_signed {
 }
 
 impl_unsigned_from_signed! {
-    u8 from i8, i16, i32, i64, isize;
-    u16 from i8, i16, i32, i64, isize;
-    u32 from i8, i16, i32, i64, isize;
-    u64 from i8, i16, i32, i64, isize;
-    usize from i8, i16, i32, i64, isize;
+    u8 from i8, i16, i32, i64, i128, isize;
+    u16 from i8, i16, i32, i64, i128, isize;
+    u32 from i8, i16, i32, i64, i128, isize;
+    u64 from i8, i16, i32, i64, i128, isize;
+    u128 from i8, i16, i32, i64, i128, isize;
+    usize from i8, i16, i32, i64, i128, isize;
 }
 
 #[test]
@@ -144,6 +148,8 @@ fn test_unsigned_from_signed() {
     assert_eq!(u8::try_from(-1i16), Err(TryFromIntError::Underflow));
     assert_eq!(u8::try_from(256i16), Err(TryFromIntError::Overflow));
 
+    assert_eq!(u128::try_from(i32::MAX), Ok(i32::MAX as u128));
+    assert_eq!(u128::try_from(-1i32), Err(TryFromIntError::Underflow));
     if cfg!(target_pointer_width = "32") {
         assert_eq!(u32::try_from(isize::MAX), Ok(0x7fff_ffffu32));
         assert_eq!(usize::try_from(i64::MAX), Err(TryFromIntError::Overflow));
@@ -170,11 +176,11 @@ macro_rules! impl_signed_from_unsigned {
 }
 
 impl_signed_from_unsigned! {
-    i8 from u8, u16, u32, u64, usize;
-    i16 from u16, u32, u64, usize;
-    i32 from u32, u64, usize;
-    i64 from u64, usize;
-    isize from u32, u64, usize;
+    i8 from u8, u16, u32, u64, u128, usize;
+    i16 from u16, u32, u64, u128, usize;
+    i32 from u32, u64, u128, usize;
+    i64 from u64, u128, usize;
+    isize from u32, u64, u128, usize;
 }
 
 #[test]
@@ -182,6 +188,8 @@ fn test_signed_from_unsigned() {
     assert_eq!(i8::try_from(0x7fu8), Ok(0x7fi8));
     assert_eq!(i8::try_from(0x80u8), Err(TryFromIntError::Overflow));
 
+    assert_eq!(i64::try_from(i64::MAX as u128), Ok(i64::MAX));
+    assert_eq!(i64::try_from(u128::MAX), Err(TryFromIntError::Overflow));
     if cfg!(target_pointer_width = "32") {
         assert_eq!(i64::try_from(usize::MAX), Ok(0xffff_ffffi64));
         assert_eq!(
@@ -214,10 +222,11 @@ macro_rules! impl_signed_from_signed {
 }
 
 impl_signed_from_signed! {
-    i8 from i16, i32, i64, isize;
-    i16 from i32, i64, isize;
-    i32 from i64, isize;
-    isize from i64;
+    i8 from i16, i32, i64, i128, isize;
+    i16 from i32, i64, i128, isize;
+    i32 from i64, i128, isize;
+    i64 from i128;
+    isize from i64, i128;
 }
 
 #[test]
@@ -226,6 +235,9 @@ fn test_signed_from_signed() {
     assert_eq!(i8::try_from(128i16), Err(TryFromIntError::Overflow));
     assert_eq!(i8::try_from(-128i16), Ok(-128i8));
     assert_eq!(i8::try_from(-129i16), Err(TryFromIntError::Underflow));
+
+    assert_eq!(i64::try_from(i64::MAX as i128), Ok(i64::MAX));
+    assert_eq!(i64::try_from(i128::MAX), Err(TryFromIntError::Overflow));
 
     if cfg!(target_pointer_width = "32") {
         assert_eq!(i32::try_from(isize::MAX), Ok(i32::MAX));
