@@ -54,7 +54,7 @@ macro_rules! impl_int_to_char {
 
             fn try_from (n: $ty) -> Result<char, TryFromIntToCharError> {
                 match u32::try_from(n)? {
-                    n @ 0...0x10ffff => match char::from_u32(n) {
+                    n @ 0..=0x10ffff => match char::from_u32(n) {
                         None => Err(TryFromIntToCharError::Reserved),
                         Some(c) => Ok(c),
                     },
